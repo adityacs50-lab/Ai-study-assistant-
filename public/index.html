@@ -66,7 +66,7 @@
         /* Main content */
         .main-content {
             display: grid;
-            grid-template-columns: 1fr 2fr;
+            grid-template-columns: 1.2fr 1.2fr 2fr;
             gap: 20px;
             flex: 1;
             overflow: hidden;
@@ -176,6 +176,82 @@
             flex-direction: column;
             overflow: hidden;
             border: 1px solid var(--border);
+        }
+
+        /* History sidebar */
+        .history-section {
+            background: var(--bg-card);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .history-header {
+            padding: 15px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .history-header h3 {
+            font-size: 1rem;
+            margin: 0;
+        }
+
+        .history-list {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .history-empty {
+            padding: 20px;
+            text-align: center;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+        }
+
+        .history-item {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .history-item:hover {
+            background: var(--bg-hover);
+            border-left-color: var(--primary);
+        }
+
+        .history-item-question {
+            font-size: 0.85rem;
+            color: var(--text-primary);
+            font-weight: 600;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .history-item-time {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .history-counter {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            margin-left: 8px;
         }
 
         .chat-header {
@@ -528,6 +604,18 @@
                 <input type="file" id="fileInput" accept=".pdf" />
             </div>
 
+            <!-- History Section -->
+            <div class="history-section">
+                <div class="history-header">
+                    <h3>📋 History <span class="history-counter" id="historyCounter">0</span></h3>
+                </div>
+                <div class="history-list" id="historyList">
+                    <div class="history-empty">
+                        <p>No questions yet</p>
+                    </div>
+                </div>
+            </div>
+
             <!-- Chat Section -->
             <div class="chat-section">
                 <div class="chat-header">
@@ -577,6 +665,7 @@
         // State management
         let currentSessionId = null;
         let isLoading = false;
+        let chatHistoryData = [];
 
         const elements = {
             uploadSection: document.getElementById('uploadSection'),
@@ -592,6 +681,8 @@
             chatStatus: document.getElementById('chatStatus'),
             errorMessage: document.getElementById('errorMessage'),
             modelSelect: document.getElementById('modelSelect'),
+            historyList: document.getElementById('historyList'),
+            historyCounter: document.getElementById('historyCounter'),
         };
 
         // File upload handlers
@@ -659,6 +750,11 @@
                 elements.questionInput.disabled = false;
                 elements.sendButton.disabled = false;
 
+                // Reset history for new PDF
+                chatHistoryData = [];
+                elements.historyList.innerHTML = '<div class="history-empty"><p>No questions yet</p></div>';
+                elements.historyCounter.textContent = '0';
+
                 // Clear messages and show welcome
                 elements.messages.innerHTML = `
                     <div class="empty-state">
@@ -719,6 +815,9 @@
 
                 // Add assistant response
                 addMessage('assistant', data.answer);
+
+                // Update history
+                updateHistory(question, data.answer);
             } catch (error) {
                 showError(`Error: ${error.message}`);
                 const lastMessage = elements.messages.lastElementChild;
@@ -730,6 +829,37 @@
                 elements.questionInput.disabled = false;
                 elements.questionInput.focus();
             }
+        }
+
+        // Update history display
+        function updateHistory(question, answer) {
+            const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            chatHistoryData.push({ question, answer, timestamp });
+
+            if (elements.historyList.querySelector('.history-empty')) {
+                elements.historyList.innerHTML = '';
+            }
+
+            const historyItem = document.createElement('div');
+            historyItem.className = 'history-item';
+            historyItem.innerHTML = `
+                <div class="history-item-question">${question.substring(0, 50)}${question.length > 50 ? '...' : ''}</div>
+                <div class="history-item-time">${timestamp}</div>
+            `;
+
+            historyItem.addEventListener('click', () => {
+                const idx = chatHistoryData.indexOf(chatHistoryData.find(h => h.timestamp === timestamp && h.question === question));
+                if (idx !== -1) {
+                    // Highlight the item
+                    document.querySelectorAll('.history-item').forEach(item => item.style.borderLeftColor = 'transparent');
+                    historyItem.style.borderLeftColor = 'var(--primary)';
+                }
+            });
+
+            elements.historyList.appendChild(historyItem);
+
+            // Update counter
+            elements.historyCounter.textContent = chatHistoryData.length;
         }
 
         // Helper functions
