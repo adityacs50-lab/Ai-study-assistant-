@@ -320,7 +320,7 @@ Have questions or feedback?
 
 ## 👨‍💻 Author
 
-**Umesh Shinde**
+**Aditya Shinde**
 - GitHub: [@adityacs50-lab](https://github.com/adityacs50-lab)
 - Project: [AI Study Assistant](https://github.com/adityacs50-lab/Ai-study-assistant-)
 
@@ -344,3 +344,4 @@ Made with ❤️ by Umesh Shinde
 [GitHub](https://github.com/adityacs50-lab/Ai-study-assistant-) • [Issues](https://github.com/adityacs50-lab/Ai-study-assistant-/issues)
 
 </div>
+
