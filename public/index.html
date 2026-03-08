@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Study Assistant - Chat with Your PDFs</title>
+    <title>AI Study Assistant - Chat with PDFs</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
     <style>
         * {
@@ -13,15 +13,16 @@
         }
 
         :root {
-            --primary: #7c3aed;
-            --primary-dark: #6d28d9;
-            --bg-dark: #0f172a;
-            --bg-card: #1e293b;
-            --bg-hover: #334155;
-            --text-primary: #f1f5f9;
-            --text-secondary: #cbd5e1;
-            --border: #334155;
-            --error: #ef4444;
+            --primary: #10a981;
+            --primary-dark: #059669;
+            --bg-dark: #0d0d0d;
+            --bg-darker: #0a0a0a;
+            --bg-card: #1a1a1a;
+            --bg-hover: #2a2a2a;
+            --text-primary: #ececec;
+            --text-secondary: #b4b4b4;
+            --border: #404040;
+            --error: #ff6b6b;
             --success: #10b981;
         }
 
@@ -32,259 +33,276 @@
             line-height: 1.6;
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* Header */
-        header {
-            text-align: center;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            background: linear-gradient(135deg, var(--primary), #ec4899);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .subtitle {
-            color: var(--text-secondary);
-            font-size: 1.1rem;
-        }
-
-        /* Main content */
-        .main-content {
+        .app-container {
             display: grid;
-            grid-template-columns: 1.2fr 1.2fr 2fr;
-            gap: 20px;
-            flex: 1;
+            grid-template-columns: 260px 1fr;
+            height: 100vh;
             overflow: hidden;
         }
 
-        /* Upload section */
-        .upload-section {
-            background: var(--bg-card);
-            border: 2px dashed var(--border);
-            border-radius: 12px;
-            padding: 30px;
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            background: var(--bg-darker);
+            border-right: 1px solid var(--border);
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
+            overflow: hidden;
         }
 
-        .upload-section:hover {
-            border-color: var(--primary);
-            background: var(--bg-hover);
+        .sidebar-top {
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
         }
 
-        .upload-section.dragging {
-            border-color: var(--primary);
-            background: rgba(124, 58, 237, 0.1);
-        }
-
-        #fileInput {
-            display: none;
-        }
-
-        .upload-icon {
-            font-size: 3rem;
-            margin-bottom: 15px;
-        }
-
-        .upload-text {
-            text-align: center;
-        }
-
-        .upload-text h3 {
-            margin-bottom: 10px;
-            font-size: 1.3rem;
-        }
-
-        .upload-text p {
-            color: var(--text-secondary);
-            font-size: 0.95rem;
-            margin-bottom: 20px;
-        }
-
-        .upload-button {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 12px 30px;
+        .new-chat-btn {
+            width: 100%;
+            padding: 10px 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
             border-radius: 8px;
             cursor: pointer;
-            font-size: 1rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            margin-top: 15px;
-        }
-
-        .upload-button:hover {
-            background: var(--primary-dark);
-            transform: translateY(-2px);
-        }
-
-        .upload-button:active {
-            transform: translateY(0);
-        }
-
-        .file-info {
-            margin-top: 20px;
-            padding: 15px;
-            background: rgba(16, 185, 129, 0.1);
-            border-left: 4px solid var(--success);
-            border-radius: 6px;
-            text-align: center;
-            display: none;
-        }
-
-        .file-info.show {
-            display: block;
-        }
-
-        .file-info-name {
-            font-weight: 600;
-            color: var(--success);
-            margin-bottom: 5px;
-        }
-
-        .file-info-meta {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-        }
-
-        /* Chat section */
-        .chat-section {
-            background: var(--bg-card);
-            border-radius: 12px;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            border: 1px solid var(--border);
-        }
-
-        /* History sidebar */
-        .history-section {
-            background: var(--bg-card);
-            border-radius: 12px;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            border: 1px solid var(--border);
-        }
-
-        .history-header {
-            padding: 15px;
-            border-bottom: 1px solid var(--border);
-            background: rgba(0, 0, 0, 0.2);
-        }
-
-        .history-header h3 {
-            font-size: 1rem;
-            margin: 0;
-        }
-
-        .history-list {
-            flex: 1;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .history-empty {
-            padding: 20px;
-            text-align: center;
-            color: var(--text-secondary);
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
             display: flex;
             align-items: center;
             justify-content: center;
+            gap: 8px;
+        }
+
+        .new-chat-btn:hover {
+            background: var(--bg-hover);
+            border-color: var(--text-secondary);
+        }
+
+        .sidebar-content {
             flex: 1;
+            overflow-y: auto;
+            padding: 12px 0;
         }
 
         .history-item {
-            padding: 12px 15px;
-            border-bottom: 1px solid var(--border);
+            padding: 12px 16px;
+            margin: 4px 8px;
+            border-radius: 8px;
             cursor: pointer;
             transition: all 0.2s ease;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
             border-left: 3px solid transparent;
         }
 
         .history-item:hover {
             background: var(--bg-hover);
+            color: var(--text-primary);
             border-left-color: var(--primary);
         }
 
-        .history-item-question {
-            font-size: 0.85rem;
+        .history-item.active {
+            background: var(--bg-hover);
             color: var(--text-primary);
-            font-weight: 600;
-            margin-bottom: 4px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            border-left-color: var(--primary);
         }
 
-        .history-item-time {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
+        .sidebar-bottom {
+            padding: 12px 8px;
+            border-top: 1px solid var(--border);
         }
 
-        .history-counter {
-            display: inline-block;
+        .user-info {
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .user-info:hover {
+            background: var(--bg-hover);
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
             background: var(--primary);
-            color: white;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 0.8rem;
-            margin-left: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
         }
 
-        .chat-header {
-            padding: 20px;
+        .user-name {
+            font-size: 0.9rem;
+            color: var(--text-primary);
+        }
+
+        /* ===== MAIN AREA ===== */
+        .main-area {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* ===== TOP BAR ===== */
+        .top-bar {
+            background: var(--bg-card);
             border-bottom: 1px solid var(--border);
-            background: rgba(0, 0, 0, 0.2);
+            padding: 12px 24px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .chat-header h3 {
-            font-size: 1.2rem;
-            margin-bottom: 5px;
+        .top-bar-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex: 1;
         }
 
-        .chat-status {
+        .pdf-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .pdf-status {
+            display: none;
+        }
+
+        .pdf-status.active {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .pdf-icon {
+            font-size: 1.5rem;
+        }
+
+        .pdf-details {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .pdf-name {
+            font-size: 0.95rem;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .pdf-meta {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .top-bar-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .model-selector {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .model-selector label {
             font-size: 0.9rem;
             color: var(--text-secondary);
         }
 
-        .chat-status.active {
-            color: var(--success);
+        #modelSelect {
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
         }
 
-        /* Messages */
-        .messages {
+        #modelSelect:hover {
+            border-color: var(--primary);
+        }
+
+        #modelSelect:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(16, 169, 129, 0.1);
+        }
+
+        .upload-trigger {
+            padding: 0;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: color 0.2s ease;
+        }
+
+        .upload-trigger:hover {
+            color: var(--primary);
+        }
+
+        /* ===== CHAT AREA ===== */
+        .chat-area {
+            display: grid;
+            grid-template-columns: 1fr 280px;
+            gap: 0;
             flex: 1;
-            overflow-y: auto;
-            padding: 20px;
+            overflow: hidden;
+        }
+
+        .messages-container {
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            overflow-y: auto;
+            padding: 24px;
+        }
+
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-state-text {
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .empty-state-subtext {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+        }
+
+        .messages {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
         }
 
         .message {
@@ -309,83 +327,77 @@
         }
 
         .message-avatar {
-            width: 36px;
-            height: 36px;
-            border-radius: 8px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.2rem;
+            font-size: 1rem;
             flex-shrink: 0;
         }
 
         .message.assistant .message-avatar {
-            background: rgba(124, 58, 237, 0.2);
+            background: var(--primary);
+            font-weight: bold;
         }
 
         .message.user .message-avatar {
-            background: rgba(59, 130, 246, 0.2);
+            background: var(--bg-hover);
         }
 
-        .message-content {
-            max-width: 70%;
+        .message-bubble {
+            max-width: 65%;
             padding: 12px 16px;
-            border-radius: 10px;
+            border-radius: 12px;
             word-wrap: break-word;
         }
 
-        .message.assistant .message-content {
-            background: var(--bg-hover);
+        .message.assistant .message-bubble {
+            background: var(--bg-card);
             color: var(--text-primary);
-            border-left: 3px solid var(--primary);
+            border: 1px solid var(--border);
         }
 
-        .message.user .message-content {
+        .message.user .message-bubble {
             background: var(--primary);
             color: white;
         }
 
-        .message-time {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            margin-top: 5px;
-            text-align: right;
-        }
-
         /* Markdown styling */
-        .message.assistant .message-content p {
+        .message.assistant .message-bubble p {
             margin: 6px 0;
         }
 
-        .message.assistant .message-content strong {
-            color: #c084fc;
+        .message.assistant .message-bubble strong {
+            color: var(--primary);
         }
 
-        .message.assistant .message-content ol,
-        .message.assistant .message-content ul {
+        .message.assistant .message-bubble h1,
+        .message.assistant .message-bubble h2,
+        .message.assistant .message-bubble h3 {
+            color: var(--text-primary);
+            margin: 10px 0 6px 0;
+        }
+
+        .message.assistant .message-bubble ol,
+        .message.assistant .message-bubble ul {
             padding-left: 20px;
             margin: 8px 0;
         }
 
-        .message.assistant .message-content li {
+        .message.assistant .message-bubble li {
             margin: 4px 0;
         }
 
-        .message.assistant .message-content h1,
-        .message.assistant .message-content h2,
-        .message.assistant .message-content h3 {
-            color: #a855f7;
-            margin: 10px 0 6px 0;
-        }
-
-        .message.assistant .message-content code {
+        .message.assistant .message-bubble code {
             background: rgba(0, 0, 0, 0.3);
             padding: 2px 6px;
             border-radius: 3px;
             font-size: 0.9em;
         }
 
-        .message.assistant .message-content pre {
+        .message.assistant .message-bubble pre {
             background: rgba(0, 0, 0, 0.3);
             padding: 12px;
             border-radius: 6px;
@@ -393,31 +405,92 @@
             margin: 8px 0;
         }
 
-        .empty-state {
+        /* ===== SIDEBAR RIGHT (HISTORY) ===== */
+        .history-sidebar {
+            background: var(--bg-card);
+            border-left: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .history-header {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .history-counter {
+            background: var(--primary);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+
+        .history-list {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .history-list-item {
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .history-list-item:hover {
+            background: rgba(16, 169, 129, 0.1);
+            border-left-color: var(--primary);
+        }
+
+        .history-question {
+            font-size: 0.85rem;
+            color: var(--text-primary);
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 4px;
+        }
+
+        .history-time {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .history-empty {
+            padding: 20px 12px;
+            text-align: center;
+            color: var(--text-secondary);
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 100%;
-            color: var(--text-secondary);
-            text-align: center;
+            flex: 1;
+            font-size: 0.9rem;
         }
 
-        .empty-state-icon {
-            font-size: 3rem;
-            margin-bottom: 15px;
-            opacity: 0.5;
-        }
-
-        /* Input section */
-        .chat-input-section {
-            padding: 20px;
+        /* ===== INPUT AREA ===== */
+        .input-area {
+            background: var(--bg-card);
             border-top: 1px solid var(--border);
-            background: rgba(0, 0, 0, 0.2);
+            padding: 16px 24px;
         }
 
-        .input-group {
+        .input-wrapper {
             display: flex;
-            gap: 10px;
+            gap: 12px;
+            max-width: 100%;
         }
 
         #questionInput {
@@ -428,13 +501,15 @@
             padding: 12px 16px;
             border-radius: 8px;
             font-size: 1rem;
-            transition: border-color 0.3s ease;
+            resize: none;
+            max-height: 100px;
+            transition: all 0.2s ease;
         }
 
         #questionInput:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+            box-shadow: 0 0 0 2px rgba(16, 169, 129, 0.1);
         }
 
         #questionInput:disabled {
@@ -451,7 +526,7 @@
             cursor: pointer;
             font-size: 1rem;
             font-weight: 600;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             display: flex;
             align-items: center;
             gap: 8px;
@@ -459,7 +534,7 @@
 
         .send-button:hover:not(:disabled) {
             background: var(--primary-dark);
-            transform: translateY(-2px);
+            transform: translateY(-1px);
         }
 
         .send-button:active:not(:disabled) {
@@ -469,39 +544,6 @@
         .send-button:disabled {
             opacity: 0.5;
             cursor: not-allowed;
-        }
-
-        /* Model selector */
-        .model-selector {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .model-selector label {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-        }
-
-        #modelSelect {
-            background: var(--bg-dark);
-            border: 1px solid var(--border);
-            color: var(--text-primary);
-            padding: 6px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: border-color 0.3s ease;
-        }
-
-        #modelSelect:hover {
-            border-color: var(--primary);
-        }
-
-        #modelSelect:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.1);
         }
 
         /* Loading spinner */
@@ -527,13 +569,13 @@
 
         /* Error message */
         .error-message {
-            background: rgba(239, 68, 68, 0.1);
+            background: rgba(255, 107, 107, 0.1);
             border-left: 4px solid var(--error);
-            color: #fca5a5;
+            color: #ff9999;
             padding: 12px 16px;
             border-radius: 6px;
-            margin-bottom: 15px;
             display: none;
+            margin-bottom: 12px;
         }
 
         .error-message.show {
@@ -541,176 +583,195 @@
             animation: slideIn 0.3s ease;
         }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-            .main-content {
-                grid-template-columns: 1fr;
-            }
-
-            h1 {
-                font-size: 1.8rem;
-            }
-
-            .message-content {
-                max-width: 90%;
-            }
-
-            .container {
-                height: auto;
-            }
+        /* File input */
+        #fileInput {
+            display: none;
         }
 
-        /* Scrollbar styling */
-        .messages::-webkit-scrollbar {
-            width: 6px;
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
         }
 
-        .messages::-webkit-scrollbar-track {
+        ::-webkit-scrollbar-track {
             background: transparent;
         }
 
-        .messages::-webkit-scrollbar-thumb {
+        ::-webkit-scrollbar-thumb {
             background: var(--border);
-            border-radius: 3px;
+            border-radius: 4px;
         }
 
-        .messages::-webkit-scrollbar-thumb:hover {
+        ::-webkit-scrollbar-thumb:hover {
             background: var(--text-secondary);
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 1024px) {
+            .app-container {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                display: none;
+            }
+
+            .chat-area {
+                grid-template-columns: 1fr;
+            }
+
+            .history-sidebar {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .top-bar {
+                flex-direction: column;
+                gap: 12px;
+                align-items: flex-start;
+            }
+
+            .top-bar-left,
+            .top-bar-right {
+                width: 100%;
+            }
+
+            .message-bubble {
+                max-width: 85%;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>📚 AI Study Assistant</h1>
-            <p class="subtitle">Chat with your PDFs using Claude AI</p>
-        </header>
-
-        <div class="main-content">
-            <!-- Upload Section -->
-            <div class="upload-section" id="uploadSection">
-                <div class="upload-icon">📄</div>
-                <div class="upload-text">
-                    <h3>Upload a PDF</h3>
-                    <p>Click to select or drag your PDF here</p>
-                    <button class="upload-button" id="uploadButton">Choose File</button>
-                </div>
-                <div class="file-info" id="fileInfo">
-                    <div class="file-info-name" id="fileName"></div>
-                    <div class="file-info-meta">
-                        <span id="filePages"></span> • <span id="fileSize"></span>
-                    </div>
-                </div>
-                <input type="file" id="fileInput" accept=".pdf" />
+    <div class="app-container">
+        <!-- LEFT SIDEBAR -->
+        <div class="sidebar">
+            <div class="sidebar-top">
+                <button class="new-chat-btn" id="newChatBtn">
+                    <span>+ New Chat</span>
+                </button>
             </div>
 
-            <!-- History Section -->
-            <div class="history-section">
-                <div class="history-header">
-                    <h3>📋 History <span class="history-counter" id="historyCounter">0</span></h3>
-                </div>
-                <div class="history-list" id="historyList">
-                    <div class="history-empty">
-                        <p>No questions yet</p>
-                    </div>
+            <div class="sidebar-content" id="sidebarHistory">
+                <div style="padding: 20px 16px; text-align: center; color: var(--text-secondary); font-size: 0.9rem;">
+                    No conversations yet
                 </div>
             </div>
 
-            <!-- Chat Section -->
-            <div class="chat-section">
-                <div class="chat-header">
-                    <div>
-                        <h3>💬 Chat</h3>
-                        <div class="chat-status" id="chatStatus">Upload a PDF to start</div>
+            <div class="sidebar-bottom">
+                <div class="user-info">
+                    <div class="user-avatar">📚</div>
+                    <div class="user-name">Study Assistant</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN AREA -->
+        <div class="main-area">
+            <!-- TOP BAR -->
+            <div class="top-bar">
+                <div class="top-bar-left">
+                    <div class="pdf-info">
+                        <div class="pdf-status" id="pdfStatus">
+                            <div class="pdf-icon">📄</div>
+                            <div class="pdf-details">
+                                <div class="pdf-name" id="pdfName"></div>
+                                <div class="pdf-meta">
+                                    <span id="pdfPages"></span> • <span id="pdfSize"></span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
+                </div>
+
+                <div class="top-bar-right">
                     <div class="model-selector">
-                        <label for="modelSelect">Model:</label>
+                        <label for="modelSelect">AI Model:</label>
                         <select id="modelSelect">
                             <option value="claude-opus-4-1">Opus 4.1 (Best)</option>
                             <option value="claude-sonnet-4-20250514">Sonnet 4 (Fast)</option>
                             <option value="claude-3-5-sonnet-20241022">Sonnet 3.5 (Balanced)</option>
                         </select>
                     </div>
+                    <button class="upload-trigger" id="uploadTrigger" title="Upload PDF">📤</button>
                 </div>
+            </div>
 
-                <div class="error-message" id="errorMessage"></div>
+            <!-- CHAT AREA -->
+            <div class="chat-area">
+                <!-- MESSAGES -->
+                <div class="messages-container">
+                    <div class="error-message" id="errorMessage"></div>
 
-                <div class="messages" id="messages">
-                    <div class="empty-state">
-                        <div>
-                            <div class="empty-state-icon">✨</div>
-                            <p>Upload a PDF and ask questions to get started!</p>
+                    <div id="messagesWrapper">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📚</div>
+                            <div class="empty-state-text">AI Study Assistant</div>
+                            <div class="empty-state-subtext">Upload a PDF to start asking questions</div>
                         </div>
                     </div>
                 </div>
 
-                <div class="chat-input-section">
-                    <div class="input-group">
-                        <input
-                            type="text"
-                            id="questionInput"
-                            placeholder="Ask a question about your PDF..."
-                            disabled
-                        />
-                        <button class="send-button" id="sendButton" disabled>
-                            Send
-                        </button>
+                <!-- HISTORY SIDEBAR -->
+                <div class="history-sidebar">
+                    <div class="history-header">
+                        CHAT HISTORY
+                        <span class="history-counter" id="historyCounter">0</span>
+                    </div>
+                    <div class="history-list" id="historyList">
+                        <div class="history-empty">No Q&A yet</div>
                     </div>
                 </div>
             </div>
+
+            <!-- INPUT AREA -->
+            <div class="input-area">
+                <div class="input-wrapper">
+                    <input
+                        type="text"
+                        id="questionInput"
+                        placeholder="Ask a question about your PDF..."
+                        disabled
+                    />
+                    <button class="send-button" id="sendButton" disabled>
+                        Send
+                    </button>
+                </div>
+            </div>
         </div>
+
+        <input type="file" id="fileInput" accept=".pdf" />
     </div>
 
     <script>
-        // State management
+        // State
         let currentSessionId = null;
         let isLoading = false;
         let chatHistoryData = [];
+        let conversations = [];
 
         const elements = {
-            uploadSection: document.getElementById('uploadSection'),
             fileInput: document.getElementById('fileInput'),
-            uploadButton: document.getElementById('uploadButton'),
-            fileName: document.getElementById('fileName'),
-            filePages: document.getElementById('filePages'),
-            fileSize: document.getElementById('fileSize'),
-            fileInfo: document.getElementById('fileInfo'),
-            messages: document.getElementById('messages'),
+            uploadTrigger: document.getElementById('uploadTrigger'),
+            pdfStatus: document.getElementById('pdfStatus'),
+            pdfName: document.getElementById('pdfName'),
+            pdfPages: document.getElementById('pdfPages'),
+            pdfSize: document.getElementById('pdfSize'),
+            messagesWrapper: document.getElementById('messagesWrapper'),
             questionInput: document.getElementById('questionInput'),
             sendButton: document.getElementById('sendButton'),
-            chatStatus: document.getElementById('chatStatus'),
             errorMessage: document.getElementById('errorMessage'),
             modelSelect: document.getElementById('modelSelect'),
             historyList: document.getElementById('historyList'),
             historyCounter: document.getElementById('historyCounter'),
+            newChatBtn: document.getElementById('newChatBtn'),
         };
 
-        // File upload handlers
-        elements.uploadButton.addEventListener('click', () => elements.fileInput.click());
-
+        // Upload handlers
+        elements.uploadTrigger.addEventListener('click', () => elements.fileInput.click());
         elements.fileInput.addEventListener('change', handleFileSelect);
 
-        // Drag and drop
-        elements.uploadSection.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            elements.uploadSection.classList.add('dragging');
-        });
-
-        elements.uploadSection.addEventListener('dragleave', () => {
-            elements.uploadSection.classList.remove('dragging');
-        });
-
-        elements.uploadSection.addEventListener('drop', (e) => {
-            e.preventDefault();
-            elements.uploadSection.classList.remove('dragging');
-            const files = e.dataTransfer.files;
-            if (files.length > 0) {
-                elements.fileInput.files = files;
-                handleFileSelect();
-            }
-        });
-
-        // File upload handling
         async function handleFileSelect() {
             const file = elements.fileInput.files[0];
             if (!file) return;
@@ -724,7 +785,7 @@
             formData.append('pdf', file);
 
             try {
-                showError(''); // Clear errors
+                showError('');
                 const response = await fetch('/api/upload', {
                     method: 'POST',
                     body: formData
@@ -738,32 +799,44 @@
 
                 currentSessionId = data.sessionId;
 
-                // Update UI
-                elements.fileName.textContent = data.filename;
-                elements.filePages.textContent = `${data.pages} pages`;
-                elements.fileSize.textContent = `${(data.textLength / 1024).toFixed(1)} KB`;
-                elements.fileInfo.classList.add('show');
+                // Store conversation
+                conversations.push({
+                    id: data.sessionId,
+                    filename: data.filename,
+                    timestamp: new Date(),
+                    history: []
+                });
 
-                elements.chatStatus.textContent = `Loaded: ${data.filename} ✓`;
-                elements.chatStatus.classList.add('active');
+                // Update UI
+                elements.pdfName.textContent = data.filename;
+                elements.pdfPages.textContent = `${data.pages} pages`;
+                elements.pdfSize.textContent = `${(data.textLength / 1024 / 1024).toFixed(1)} MB`;
+                elements.pdfStatus.classList.add('active');
 
                 elements.questionInput.disabled = false;
                 elements.sendButton.disabled = false;
 
-                // Reset history for new PDF
+                // Reset chat
                 chatHistoryData = [];
-                elements.historyList.innerHTML = '<div class="history-empty"><p>No questions yet</p></div>';
+                elements.historyList.innerHTML = '<div class="history-empty">No Q&A yet</div>';
                 elements.historyCounter.textContent = '0';
 
-                // Clear messages and show welcome
-                elements.messages.innerHTML = `
-                    <div class="empty-state">
-                        <div>
-                            <div class="empty-state-icon">👋</div>
-                            <p>Great! Now ask me anything about "${data.filename}"</p>
+                // Update messages
+                elements.messagesWrapper.innerHTML = `
+                    <div class="messages">
+                        <div class="message assistant">
+                            <div class="message-avatar">AI</div>
+                            <div class="message-bubble">
+                                👋 Ready to help! Ask me anything about <strong>"${data.filename}"</strong>
+                            </div>
                         </div>
                     </div>
                 `;
+
+                // Add to sidebar
+                addConversationToSidebar(data.sessionId, data.filename);
+
+                elements.questionInput.focus();
             } catch (error) {
                 showError(`Upload failed: ${error.message}`);
                 console.error('Upload error:', error);
@@ -783,19 +856,16 @@
             if (!question || isLoading || !currentSessionId) return;
 
             try {
-                showError(''); // Clear errors
+                showError('');
                 isLoading = true;
                 elements.sendButton.disabled = true;
                 elements.questionInput.disabled = true;
 
-                // Add user message
                 addMessage('user', question);
                 elements.questionInput.value = '';
 
-                // Show loading message
                 addMessage('assistant', '<div class="loading-message"><span>Thinking</span><span class="spinner"></span></div>');
 
-                // Send to API
                 const selectedModel = elements.modelSelect.value;
                 const response = await fetch('/api/ask', {
                     method: 'POST',
@@ -809,19 +879,12 @@
                     throw new Error(data.error || 'Failed to get response');
                 }
 
-                // Remove loading message
-                const lastMessage = elements.messages.lastElementChild;
-                lastMessage.remove();
-
-                // Add assistant response
+                removeLastMessage();
                 addMessage('assistant', data.answer);
-
-                // Update history
                 updateHistory(question, data.answer);
             } catch (error) {
                 showError(`Error: ${error.message}`);
-                const lastMessage = elements.messages.lastElementChild;
-                lastMessage.remove();
+                removeLastMessage();
                 console.error('Question error:', error);
             } finally {
                 isLoading = false;
@@ -831,7 +894,51 @@
             }
         }
 
-        // Update history display
+        function addMessage(role, content) {
+            const messagesDiv = getOrCreateMessagesDiv();
+
+            const message = document.createElement('div');
+            message.className = `message ${role}`;
+
+            const avatar = document.createElement('div');
+            avatar.className = 'message-avatar';
+            avatar.textContent = role === 'user' ? '👤' : 'AI';
+
+            const bubble = document.createElement('div');
+            bubble.className = 'message-bubble';
+
+            if (role === 'assistant' && !content.includes('<div') && !content.includes('<span')) {
+                bubble.innerHTML = marked.parse(content);
+            } else {
+                bubble.innerHTML = content;
+            }
+
+            message.appendChild(avatar);
+            message.appendChild(bubble);
+
+            messagesDiv.appendChild(message);
+            messagesDiv.parentElement.scrollTop = messagesDiv.parentElement.scrollHeight;
+        }
+
+        function removeLastMessage() {
+            const messagesDiv = document.querySelector('.messages');
+            if (messagesDiv && messagesDiv.lastChild) {
+                messagesDiv.lastChild.remove();
+            }
+        }
+
+        function getOrCreateMessagesDiv() {
+            let messagesDiv = document.querySelector('.messages');
+            if (!messagesDiv) {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'messages';
+                elements.messagesWrapper.innerHTML = '';
+                elements.messagesWrapper.appendChild(wrapper);
+                messagesDiv = wrapper;
+            }
+            return messagesDiv;
+        }
+
         function updateHistory(question, answer) {
             const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             chatHistoryData.push({ question, answer, timestamp });
@@ -840,57 +947,51 @@
                 elements.historyList.innerHTML = '';
             }
 
-            const historyItem = document.createElement('div');
-            historyItem.className = 'history-item';
-            historyItem.innerHTML = `
-                <div class="history-item-question">${question.substring(0, 50)}${question.length > 50 ? '...' : ''}</div>
-                <div class="history-item-time">${timestamp}</div>
+            const item = document.createElement('div');
+            item.className = 'history-list-item';
+            item.innerHTML = `
+                <div class="history-question">${question.substring(0, 35)}${question.length > 35 ? '...' : ''}</div>
+                <div class="history-time">${timestamp}</div>
             `;
 
-            historyItem.addEventListener('click', () => {
-                const idx = chatHistoryData.indexOf(chatHistoryData.find(h => h.timestamp === timestamp && h.question === question));
-                if (idx !== -1) {
-                    // Highlight the item
-                    document.querySelectorAll('.history-item').forEach(item => item.style.borderLeftColor = 'transparent');
-                    historyItem.style.borderLeftColor = 'var(--primary)';
-                }
-            });
-
-            elements.historyList.appendChild(historyItem);
-
-            // Update counter
+            elements.historyList.appendChild(item);
             elements.historyCounter.textContent = chatHistoryData.length;
         }
 
-        // Helper functions
-        function addMessage(role, content) {
-            if (elements.messages.querySelector('.empty-state')) {
-                elements.messages.innerHTML = '';
+        function addConversationToSidebar(sessionId, filename) {
+            const sidebarHistory = document.getElementById('sidebarHistory');
+            if (sidebarHistory.firstChild.classList.contains('history-empty')) {
+                sidebarHistory.innerHTML = '';
             }
 
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${role}`;
+            const item = document.createElement('div');
+            item.className = 'history-item active';
+            item.textContent = filename;
+            item.addEventListener('click', () => {
+                document.querySelectorAll('.history-item').forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+            });
 
-            const avatar = document.createElement('div');
-            avatar.className = 'message-avatar';
-            avatar.textContent = role === 'user' ? '👤' : '🤖';
-
-            const contentDiv = document.createElement('div');
-            contentDiv.className = 'message-content';
-            
-            // Parse markdown for assistant messages
-            if (role === 'assistant' && !content.includes('<div') && !content.includes('<span')) {
-                contentDiv.innerHTML = marked.parse(content);
-            } else {
-                contentDiv.innerHTML = content;
-            }
-
-            messageDiv.appendChild(avatar);
-            messageDiv.appendChild(contentDiv);
-
-            elements.messages.appendChild(messageDiv);
-            elements.messages.scrollTop = elements.messages.scrollHeight;
+            sidebarHistory.insertBefore(item, sidebarHistory.firstChild);
         }
+
+        elements.newChatBtn.addEventListener('click', () => {
+            currentSessionId = null;
+            chatHistoryData = [];
+            elements.pdfStatus.classList.remove('active');
+            elements.questionInput.disabled = true;
+            elements.sendButton.disabled = true;
+            elements.questionInput.value = '';
+            elements.historyList.innerHTML = '<div class="history-empty">No Q&A yet</div>';
+            elements.historyCounter.textContent = '0';
+            elements.messagesWrapper.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">📚</div>
+                    <div class="empty-state-text">AI Study Assistant</div>
+                    <div class="empty-state-subtext">Upload a PDF to start asking questions</div>
+                </div>
+            `;
+        });
 
         function showError(message) {
             if (message) {
@@ -901,7 +1002,6 @@
             }
         }
 
-        // Initialize
         console.log('🚀 AI Study Assistant loaded!');
     </script>
 </body>
