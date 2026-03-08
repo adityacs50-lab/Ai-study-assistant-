@@ -769,11 +769,15 @@
         };
 
         // Upload handlers
-        elements.uploadTrigger.addEventListener('click', () => elements.fileInput.click());
+        elements.uploadTrigger.addEventListener('click', () => {
+            console.log('📤 Upload trigger clicked');
+            elements.fileInput.click();
+        });
         elements.fileInput.addEventListener('change', handleFileSelect);
 
         async function handleFileSelect() {
             const file = elements.fileInput.files[0];
+            console.log('File selected:', file?.name || 'none');
             if (!file) return;
 
             if (file.type !== 'application/pdf') {
@@ -838,8 +842,8 @@
 
                 elements.questionInput.focus();
             } catch (error) {
-                showError(`Upload failed: ${error.message}`);
-                console.error('Upload error:', error);
+                showError(`Upload Error: ${error.message}`);
+                console.error('❌ Upload failed:', error);
             }
         }
 
