@@ -337,11 +337,12 @@ Have questions or feedback?
 
 <div align="center">
 
-Made with ❤️ by Umesh Shinde
+Made with ❤️ by Aditya Shinde
 
 ⭐ If you find this helpful, please star the repository!
 
 [GitHub](https://github.com/adityacs50-lab/Ai-study-assistant-) • [Issues](https://github.com/adityacs50-lab/Ai-study-assistant-/issues)
 
 </div>
+
 
